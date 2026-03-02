@@ -1,45 +1,41 @@
-Este repositório contém um script em Power Query projetado para extrair, tratar e transformar dados brutos de eventos da API do Zabbix em insights estratégicos para o seu dashboard de monitoramento.
+# Zabbix Incident Intelligence: Connector for Power BI
 
-🎯 Objetivo do Projeto
-O propósito deste script não é apenas listar erros, mas transformar dados técnicos em inteligência de negócio. Com ele, você conseguirá responder a três perguntas fundamentais para a saúde da sua infraestrutura:
+Este repositório contém um script robusto em **Power Query** projetado para extrair, tratar e transformar dados de eventos da API do Zabbix em insights estratégicos para dashboards de monitoramento.
 
-Quem são os "agressores" de incidentes? (Quais hosts/serviços disparam mais alertas).
+![Status](https://img.shields.io/badge/Status-Production-brightgreen)
+![Power Query](https://img.shields.io/badge/Language-Power%20Query-blue)
 
-Qual o Host mais impactado? (Onde a infraestrutura está mais vulnerável).
+---
 
-Qual o alerta mais frequente? (Identificação de gargalos recorrentes que exigem ação definitiva).
+## 🎯 Objetivo
+Este projeto visa transformar dados técnicos brutos em inteligência de negócio, permitindo responder a três perguntas fundamentais para a saúde da sua infraestrutura:
 
-⚙️ Como utilizar e adaptar
-O script foi criado para ser flexível. Para colocá-lo em funcionamento no seu Power BI, siga os passos abaixo:
+1. **Agressores de Incidentes:** Quais hosts e serviços disparam o maior volume de alertas?
+2. **Impacto:** Qual host possui a maior indisponibilidade acumulada?
+3. **Recorrência:** Qual é o alerta mais frequente que exige correção definitiva?
 
-1. Preparação
-No Power BI, vá em Obter Dados > Consulta em Branco > Exibição > Editor Avançado e cole o código fornecido.
+---
 
-2. Adaptação (Configurações iniciais)
-Você precisará alterar apenas as primeiras variáveis do script:
+## ⚙️ Como Utilizar
 
-url: Substitua "URL DO ZABBIX" pela URL completa da API do seu Zabbix (http://seu-zabbix/api_jsonrpc.php).
+1. No **Power BI Desktop**, vá em **Obter Dados** > **Consulta Em Branco** > Exibição.
+2. Clique em **Editor Avançado** na faixa de opções superior.
+3. Cole o código do script e clique em **Concluído**.
+4. Certifique-se de preencher as variáveis de conexão:
+   - `url`: A URL da API do seu servidor Zabbix.
+   - `token`: Seu token de autenticação gerado no Zabbix.
+   - `TimestampInicio` / `TimestampFim`: Defina o período de análise (formato Unix Epoch).
 
-token: Substitua "TOKEN" pelo seu token de autenticação gerado no painel do Zabbix (Configurações > Usuários > Autenticação API).
+---
 
-TimestampInicio e TimestampFim: O script utiliza o formato Unix Epoch. Certifique-se de ajustar esses valores para o período que deseja analisar.
+## 🛠️ Personalização
 
-3. Personalização de Regras (Opcional)
-O script possui um bloco chamado #"Tratar Eventos" e #"Adicionar Categoria". Você pode adaptar essas condicionais para agrupar alertas conforme a sua necessidade:
+O script já inclui uma camada de tratamento para facilitar a análise:
 
-Snippet de código
-// Exemplo de adaptação para novos alertas
-else if Text.Contains(RawName, "SEU_NOVO_ALERTA") then "Categoria Personalizada"
-📊 O que este script processa?
-O script executa um processo de ETL (Extract, Transform, Load) completo:
+* **Tratamento de Eventos:** O bloco `#"Tratar Eventos"` padroniza nomes de alertas complexos (ex: CPU, SWAP, Memória).
+* **Categorização:** A coluna `Categoria Alertas` agrupa incidentes por tipo (Disco, Memória, Rede, etc.), permitindo filtros rápidos.
 
-Extração: Conecta via API e recupera todos os eventos de problema (value = 1) e recuperação (value = 0).
+Para adicionar novas regras, basta editar o bloco condicional no script:
 
-Cruzamento: Relaciona o início e fim de cada incidente para calcular o tempo real de indisponibilidade.
-
-Limpeza: Remove ruídos (ex: hosts não identificados) e padroniza nomes de alertas.
-
-Enriquecimento: Cria colunas calculadas como Duracao_Minutos e Categoria Alertas, facilitando a criação de gráficos de Pareto e tabelas de recorrência.
-
-💡 Dica Estratégica
-Para extrair o máximo valor, recomendo utilizar este script em conjunto com gráficos de Matriz ou Gráficos de Barras (Top N) no Power BI, usando a coluna Categoria Alertas como eixo principal. Isso isolará rapidamente os ativos que estão consumindo o tempo da sua equipe de TI.
+```powerquery
+else if Text.Contains(RawName, "SEU_NOVO_ALERTA") then "Sua Categoria"
